@@ -30,33 +30,6 @@ ebr_volume_label: db 'MOLKO OS   ' ; padded with spaces
 ebr_system_ident: db 'FAT12   '    ; padded with spaces
 
 start:
-    jmp main
-
-; Prints a string to screen
-; Params:
-;   - ds:si points to string
-puts:
-    ; save registers we modify
-    push si
-    push ax
-
-.putsLoop:
-    lodsb           ; loads a single byte from ds:si to al segmentation and increments it
-    or al, al       ; or instruction sets zero flag if the result is zero. This is used to test for null
-    jz .putsLoopEnd ; jumps when zero flag is set
-
-    mov ah, 0x0e
-    mov bh, 0
-    int 0x10
-
-    jmp .putsLoop
-
-.putsLoopEnd:
-    pop ax
-    pop si
-    ret
-
-main:
     ; setup data segments
     mov ax, 0
     mov ds, ax
@@ -94,6 +67,30 @@ wait_key_and_reboot:
 ; .halt:
 ;     cli ; disable interrupts
 ;     hlt
+
+; Prints a string to screen
+; Params:
+;   - ds:si points to string
+puts:
+    ; save registers we modify
+    push si
+    push ax
+
+.putsLoop:
+    lodsb           ; loads a single byte from ds:si to al segmentation and increments it
+    or al, al       ; or instruction sets zero flag if the result is zero. This is used to test for null
+    jz .putsLoopEnd ; jumps when zero flag is set
+
+    mov ah, 0x0e
+    mov bh, 0
+    int 0x10
+
+    jmp .putsLoop
+
+.putsLoopEnd:
+    pop ax
+    pop si
+    ret
 
 ; Converts LBA address to CHS address (hard disk address)
 ; Params:
